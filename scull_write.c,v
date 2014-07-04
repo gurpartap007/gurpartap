@@ -1,10 +1,15 @@
-head	1.29;
+head	1.30;
 access;
 symbols;
 locks
-	root:1.29; strict;
+	root:1.30; strict;
 comment	@ * @;
 
+
+1.30
+date	2014.07.04.09.32.14;	author root;	state Exp;
+branches;
+next	1.29;
 
 1.29
 date	2014.07.02.21.12.13;	author root;	state Exp;
@@ -157,11 +162,9 @@ desc
 @
 
 
-1.29
+1.30
 log
-@changed value of i to i=i-8 as is again incremented by 1.
-delete printk statement from last.
-change no. of quantums to 14.
+@printing of data done automatically according to no. of quantums.
 @
 text
 @#include"header.h"
@@ -227,11 +230,11 @@ void create_qset(struct sculldev *lsculldev,struct scullqset *lscullqset,int noq
 }
 void create_quantums(struct scullqset *lscullqset,int noq)
 {
-   int lv,no=14;
+   int lv;
    printk(KERN_INFO"function =  %s\n",__func__);
    for(lv=0;lv<=8;lv++)
    {
-	  if(no==0)
+	  if(noq==0)
 		 break;
 	  if(lv==8)
 	  {
@@ -241,13 +244,13 @@ void create_quantums(struct scullqset *lscullqset,int noq)
 	  lscullqset->data[lv]=(void *)kmalloc((8),GFP_KERNEL);
 	  memset(lscullqset->data[lv],'\0',8);
 	  printk(KERN_INFO"address of data[%d] =  %p\n",lv,lscullqset->data[lv]);
-	  no--;
+	  noq--;
    }
 }
 ssize_t scull_write(struct file *count,const char __user *buf,size_t size,loff_t *lseek)
 {
    int flag=0,i,nocr=0,noqs=0,noq=0,noctw=0,nocsw=0;
-   char *buffer1,*data;
+   char *buffer1;
    struct sculldev *lsculldev;
    struct scullqset *lscullqset;
    lsculldev=count->private_data;
@@ -257,6 +260,7 @@ ssize_t scull_write(struct file *count,const char __user *buf,size_t size,loff_t
    lsculldev->qsetsize=8;
    lsculldev->device_size=0;
 noctw=lsculldev->quantum_size;
+   printk(KERN_INFO"Value of bytes written %d\n",lsculldev->data_size);
    /*######## buffer to hold Data recieved From Application through Inode ##########*/
    buffer1=(char*)kmalloc((sizeof(char)*212),GFP_KERNEL); 
    copy_from_user(buffer1,buf,size);
@@ -292,6 +296,7 @@ flag=1;
    nocsw=nocsw+noctw;
    printk(KERN_INFO"no. of characters successfully written %d\n",nocsw);
    nocr=size-nocsw;
+   lsculldev->data_size=nocsw;
    printk(KERN_INFO"no. of characters remaining %d\n",nocr);
 	  if(i==7)
 	  {
@@ -299,6 +304,50 @@ flag=1;
 	  i=i-8;
 	  }
    }
+lscullqset=lsculldev->scullqset;
+ printk(KERN_INFO"Value of bytes written %d\n",lsculldev->data_size);
+ while(1)
+ {
+  for(i=0;i<lsculldev->qsetsize;i++)
+   {
+	  if(noq==0)
+		 break;
+   printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lscullqset->data[i]));
+   noq--;
+   printk(KERN_INFO"NOQ value in loop= %d\n",noq);
+   }
+ if(noq==0)
+	break;
+  lscullqset=lscullqset->next;
+ } 
+   return 0;
+}
+
+@
+
+
+1.29
+log
+@changed value of i to i=i-8 as is again incremented by 1.
+delete printk statement from last.
+change no. of quantums to 14.
+@
+text
+@d64 1
+a64 1
+   int lv,no=14;
+d68 1
+a68 1
+	  if(no==0)
+d78 1
+a78 1
+	  no--;
+d84 1
+a84 1
+   char *buffer1,*data;
+d94 1
+d130 1
+a137 10
    //}
  /* lscullqset=lsculldev->scullqset; 
  strcpy((char*)lscullqset->data[0],"hello");
@@ -309,7 +358,8 @@ flag=1;
    strcpy((char*)lscullqset->data[5],"noida");
    strcpy((char*)lscullqset->data[6],"india");
    strcpy((char*)lscullqset->data[7],"world");*/
-lscullqset=lsculldev->scullqset;
+d139 4
+a142 9
 /*data=malloc(sizeof(char)*8);
 memset(data,'\0',8);
    for(i=0;i<=7;i++)
@@ -319,9 +369,10 @@ data=(char *)(lscullqset->data[i]);
    printk(KERN_INFO"data in quantum[%d]= %s\n",i,data );
    }*/
   for(i=0;i<=7;i++)
-   {
-   printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lscullqset->data[i]));
-   }
+d144 2
+d147 2
+d150 4
+a153 8
   for(i=0;i<=5;i++)
    {
    printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lscullqset->next->data[i]));
@@ -330,9 +381,6 @@ data=(char *)(lscullqset->data[i]);
    {
    printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lscullqset->next->next->next->data[i]));
    }*/
-   return 0;
-}
-
 @
 
 
