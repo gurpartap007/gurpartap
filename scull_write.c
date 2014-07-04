@@ -91,6 +91,7 @@ ssize_t scull_write(struct file *count,const char __user *buf,size_t size,loff_t
    lsculldev->qsetsize=8;
    lsculldev->device_size=0;
 noctw=lsculldev->quantum_size;
+   printk(KERN_INFO"Value of F_POS %d\n",(int)count->f_pos);
    printk(KERN_INFO"Value of bytes written %d\n",lsculldev->data_size);
    /*######## buffer to hold Data recieved From Application through Inode ##########*/
    buffer1=(char*)kmalloc((sizeof(char)*212),GFP_KERNEL); 
