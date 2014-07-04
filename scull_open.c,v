@@ -1,0 +1,408 @@
+head	1.12;
+access;
+symbols;
+locks
+	root:1.12;
+comment	@ * @;
+
+
+1.12
+date	2014.07.02.21.11.39;	author root;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2014.06.30.17.40.15;	author root;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2014.06.30.17.23.41;	author root;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2014.06.30.13.10.02;	author root;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2014.06.30.12.53.46;	author root;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2014.06.30.12.26.55;	author root;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2014.06.30.12.19.26;	author root;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2014.06.30.06.22.19;	author root;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2014.06.29.09.18.33;	author root;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2014.05.22.17.12.43;	author root;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2014.05.18.22.51.08;	author root;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2014.05.12.11.04.28;	author root;	state Exp;
+branches;
+next	;
+
+
+desc
+@open the device using scullopen .
+save address of sculldev into private data of file structure.
+@
+
+
+1.12
+log
+@changed value of i in for loop according to number of quantums.
+@
+text
+@#include"header.h"
+#include"declarations.h"
+int scull_trim(struct sculldev * lsculldev)
+{
+   int i;
+   struct scullqset *lscullqset,*prev;
+   prev=NULL;
+   lscullqset=lsculldev->scullqset;
+   while(lscullqset->next!=NULL)
+   {
+	  prev=lscullqset;
+	  lscullqset=lscullqset->next;
+	  printk(KERN_INFO"freed memory %p\n",lscullqset);
+	  for(i=0;i<=5;i++)
+	  {
+		 kfree(lscullqset->data[i]);
+		 printk(KERN_INFO"freed memory data[%i]%p\n",i,lscullqset->data[i]);
+	  }
+	  kfree(lscullqset->data);
+	  printk(KERN_INFO"freed memory data %p\n",lscullqset->data);
+	  kfree(lscullqset->next);
+	  kfree(lscullqset);
+	  prev->next=NULL;
+	  lscullqset=lsculldev->scullqset;
+	  printk(KERN_INFO"freed memory %p\n",lscullqset);
+   }////////
+   for(i=0;i<8;i++)
+   {
+	  kfree(prev->data[i]);
+	  printk(KERN_INFO"freed memory data[%i]%p\n",i,prev->data[i]);
+   }
+	  kfree(prev->data);
+	  printk(KERN_INFO"freed memory data %p\n",prev->data);
+	  kfree(prev->next);
+	  kfree(prev);
+   
+	  return 0;
+}
+   int scull_open(struct inode *inodep,struct file *filep)
+   {
+	  struct sculldev *lsculldev;
+	  printk(KERN_INFO"open called in gill module\n");
+	  printk(KERN_INFO"Begin function %s\n",__func__);
+	  lsculldev=container_of(inodep->i_cdev,struct sculldev,c_dev);
+	  printk(KERN_INFO"Address of device is %p\n",lsculldev);
+	  filep->private_data=lsculldev;
+	  printk(KERN_INFO"addresss of private data = %p\n",filep->private_data);
+	  if((filep->f_flags & O_ACCMODE) == O_WRONLY)
+	  {
+		 printk(KERN_INFO"OPEN WITH WRITE ONLY\n");
+	  if(!lsculldev->scullqset)
+		 printk(KERN_INFO"Scullqset not found\n");
+	  else
+	  {
+		 printk(KERN_INFO"Scullqset found\n");
+		 scull_trim(lsculldev);
+	  }
+	  }
+	  if((filep->f_flags & O_ACCMODE) == O_RDONLY)
+		 printk(KERN_INFO"OPEN WITH READ ONLY\n");
+	  if((filep->f_flags & O_ACCMODE) == O_RDWR)
+		 printk(KERN_INFO"OPEN WITH READ/WRITE ONLY\n");
+	  return 0;
+   }
+
+@
+
+
+1.11
+log
+@corrected revision .
+@
+text
+@d14 1
+a14 1
+	  for(i=0;i<8;i++)
+@
+
+
+1.10
+log
+@*** empty log message ***
+@
+text
+@d3 1
+a3 1
+int scull_open(struct inode *inodep,struct file *filep)
+d5 47
+a51 10
+   struct sculldev *lsculldev;
+   printk(KERN_INFO"open called in gill module\n");
+   printk(KERN_INFO"Begin function %s\n",__func__);
+   lsculldev=container_of(inodep->i_cdev,struct sculldev,c_dev);
+   printk(KERN_INFO"Address of device is %p\n",lsculldev);
+   filep->private_data=lsculldev;
+   printk(KERN_INFO"addresss of private data = %p\n",filep->private_data);
+   if((filep->f_flags & O_ACCMODE) == O_WRONLY) 
+	  printk(KERN_INFO"OPEN WITH WRITE ONLY\n");
+      if(!lsculldev->scullqset)
+d54 1
+d56 10
+a65 6
+   if((filep->f_flags & O_ACCMODE) == O_RDONLY) 
+	  printk(KERN_INFO"OPEN WITH READ ONLY\n");
+   if((filep->f_flags & O_ACCMODE) == O_RDWR) 
+	  printk(KERN_INFO"OPEN WITH READ/WRITE ONLY\n");
+   return 0;
+}
+@
+
+
+1.9
+log
+@corrected logical error.
+deleted for loop{}
+braces
+@
+text
+@d3 1
+a3 1
+int scull_trim(struct sculldev * lsculldev)
+d5 10
+a14 47
+   int i;
+   struct scullqset *lscullqset,*prev;
+   prev=NULL;
+   lscullqset=lsculldev->scullqset;
+   while(lscullqset->next!=NULL)
+   {
+	  prev=lscullqset;
+	  lscullqset=lscullqset->next;
+	  printk(KERN_INFO"freed memory %p\n",lscullqset);
+	  for(i=0;i<8;i++)
+	  {
+		 kfree(lscullqset->data[i]);
+		 printk(KERN_INFO"freed memory data[%i]%p\n",i,lscullqset->data[i]);
+	  }
+	  kfree(lscullqset->data);
+	  printk(KERN_INFO"freed memory data %p\n",lscullqset->data);
+	  kfree(lscullqset->next);
+	  kfree(lscullqset);
+	  prev->next=NULL;
+	  lscullqset=lsculldev->scullqset;
+	  printk(KERN_INFO"freed memory %p\n",lscullqset);
+   }
+   for(i=0;i<8;i++)
+   {
+	  kfree(prev->data[i]);
+	  printk(KERN_INFO"freed memory data[%i]%p\n",i,prev->data[i]);
+   }
+	  kfree(prev->data);
+	  printk(KERN_INFO"freed memory data %p\n",prev->data);
+	  kfree(prev->next);
+	  kfree(prev);
+   
+	  return 0;
+}
+   int scull_open(struct inode *inodep,struct file *filep)
+   {
+	  struct sculldev *lsculldev;
+	  printk(KERN_INFO"open called in gill module\n");
+	  printk(KERN_INFO"Begin function %s\n",__func__);
+	  lsculldev=container_of(inodep->i_cdev,struct sculldev,c_dev);
+	  printk(KERN_INFO"Address of device is %p\n",lsculldev);
+	  filep->private_data=lsculldev;
+	  printk(KERN_INFO"addresss of private data = %p\n",filep->private_data);
+	  if((filep->f_flags & O_ACCMODE) == O_WRONLY)
+	  {
+		 printk(KERN_INFO"OPEN WITH WRITE ONLY\n");
+	  if(!lsculldev->scullqset)
+a16 1
+	  {
+d18 6
+a23 10
+		 scull_trim(lsculldev);
+	  }
+	  }
+	  if((filep->f_flags & O_ACCMODE) == O_RDONLY)
+		 printk(KERN_INFO"OPEN WITH READ ONLY\n");
+	  if((filep->f_flags & O_ACCMODE) == O_RDWR)
+		 printk(KERN_INFO"OPEN WITH READ/WRITE ONLY\n");
+	  return 0;
+   }
+
+@
+
+
+1.8
+log
+@corrected code in scull trim which cause kernel crash.
+@
+text
+@d27 1
+a27 1
+/*   for(i=0;i<8;i++)
+d31 1
+d36 1
+a36 1
+   }*/
+d49 1
+d57 1
+@
+
+
+1.7
+log
+@corrected logical error.
+@
+text
+@d27 1
+a27 1
+   for(i=0;i<8;i++)
+d35 1
+a35 1
+   }
+@
+
+
+1.6
+log
+@changed while loop condition and modification in scull trim.
+@
+text
+@d35 1
+d37 1
+a37 1
+   }
+@
+
+
+1.5
+log
+@implemented scull_trim function.
+change scullqset==NULL to lscullqset->next==NULL.
+@
+text
+@d6 2
+a7 1
+   struct scullqset *lscullqset;
+d9 40
+a48 29
+   while(lscullqset->next==NULL)
+{
+lscullqset=lscullqset->next;
+printk(KERN_INFO"freed memory %p\n",lscullqset);
+}
+for(i=0;i<8;i++)
+{
+kfree(lscullqset->data[i]);
+printk(KERN_INFO"freed memory data[%i]%p\n",i,lscullqset->data[i]);
+}
+kfree(lscullqset->data);
+printk(KERN_INFO"freed memory data %p\n",lscullqset->data);
+lscullqset->next=NULL;
+kfree(lscullqset);
+printk(KERN_INFO"freed memory %p\n",lscullqset);
+return 0;
+}
+int scull_open(struct inode *inodep,struct file *filep)
+{
+   struct sculldev *lsculldev;
+   printk(KERN_INFO"open called in gill module\n");
+   printk(KERN_INFO"Begin function %s\n",__func__);
+   lsculldev=container_of(inodep->i_cdev,struct sculldev,c_dev);
+   printk(KERN_INFO"Address of device is %p\n",lsculldev);
+   filep->private_data=lsculldev;
+   printk(KERN_INFO"addresss of private data = %p\n",filep->private_data);
+   if((filep->f_flags & O_ACCMODE) == O_WRONLY) 
+	  printk(KERN_INFO"OPEN WITH WRITE ONLY\n");
+      if(!lsculldev->scullqset)
+d53 1
+a53 1
+	  scull_trim(lsculldev);
+d55 7
+a61 6
+   if((filep->f_flags & O_ACCMODE) == O_RDONLY) 
+	  printk(KERN_INFO"OPEN WITH READ ONLY\n");
+   if((filep->f_flags & O_ACCMODE) == O_RDWR) 
+	  printk(KERN_INFO"OPEN WITH READ/WRITE ONLY\n");
+   return 0;
+}
+@
+
+
+1.4
+log
+@included write only message.
+@
+text
+@d3 22
+d39 1
+d41 2
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@a2 1
+//#include"file_operations.h"
+d14 4
+@
+
+
+1.2
+log
+@no change
+@
+text
+@d10 1
+a10 1
+   printk(KERN_INFO"Address of dvice is %p\n",lsculldev);
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d3 1
+d7 2
+a8 2
+   printk(KERN_INFO"open called\n");
+   printk(KERN_INFO"Begin function %s",__func__);
+@

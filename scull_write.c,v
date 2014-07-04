@@ -1,0 +1,960 @@
+head	1.29;
+access;
+symbols;
+locks
+	root:1.29; strict;
+comment	@ * @;
+
+
+1.29
+date	2014.07.02.21.12.13;	author root;	state Exp;
+branches;
+next	1.28;
+
+1.28
+date	2014.06.30.17.23.42;	author root;	state Exp;
+branches;
+next	1.27;
+
+1.27
+date	2014.06.30.12.23.11;	author root;	state Exp;
+branches;
+next	1.26;
+
+1.26
+date	2014.06.30.08.42.39;	author root;	state Exp;
+branches;
+next	1.25;
+
+1.25
+date	2014.06.30.08.41.17;	author root;	state Exp;
+branches;
+next	1.24;
+
+1.24
+date	2014.06.30.08.29.37;	author root;	state Exp;
+branches;
+next	1.23;
+
+1.23
+date	2014.06.30.08.27.00;	author root;	state Exp;
+branches;
+next	1.22;
+
+1.22
+date	2014.06.30.07.12.31;	author root;	state Exp;
+branches;
+next	1.21;
+
+1.21
+date	2014.06.30.06.40.48;	author root;	state Exp;
+branches;
+next	1.20;
+
+1.20
+date	2014.06.29.09.19.05;	author root;	state Exp;
+branches;
+next	1.19;
+
+1.19
+date	2014.06.09.05.08.37;	author root;	state Exp;
+branches;
+next	1.18;
+
+1.18
+date	2014.06.08.11.42.28;	author root;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	2014.06.05.06.39.38;	author root;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	2014.06.05.06.32.18;	author root;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	2014.06.05.05.23.40;	author root;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	2014.06.05.05.19.40;	author root;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2014.06.05.04.52.35;	author root;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	2014.06.05.04.49.24;	author root;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2014.06.05.04.43.52;	author root;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2014.06.05.03.58.07;	author root;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2014.06.03.05.00.28;	author root;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2014.05.22.18.01.26;	author root;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2014.05.22.17.13.37;	author root;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2014.05.21.22.10.24;	author root;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2014.05.18.23.05.25;	author root;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2014.05.18.23.02.55;	author root;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2014.05.18.23.00.56;	author root;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2014.05.18.22.51.20;	author root;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2014.05.12.11.06.35;	author root;	state Exp;
+branches;
+next	;
+
+
+desc
+@written buffer into node made by mknod c 248 0
+@
+
+
+1.29
+log
+@changed value of i to i=i-8 as is again incremented by 1.
+delete printk statement from last.
+change no. of quantums to 14.
+@
+text
+@#include"header.h"
+/*######## Function to calculate no. of Scullqsets #################*/
+int calculate_scullqsets(struct sculldev *lsculldev,int size)
+{
+   int noqs=0;
+   printk(KERN_INFO"quantum_size=%d\n",lsculldev->quantum_size);
+   printk(KERN_INFO"qset_size=%d\n",lsculldev->qsetsize);
+   printk(KERN_INFO"lsculldev=%p\n",lsculldev);
+   noqs=size/(lsculldev->quantum_size*lsculldev->qsetsize);
+   if(size%(lsculldev->quantum_size*lsculldev->qsetsize))
+	  noqs++;
+   return noqs;
+}
+
+/*########## scullqsets are made according to data bytes written to device buffer ############*/
+struct scullqset * create_scullqset(int noqs)
+{
+   int i;
+   struct scullqset *first,*temp;
+   printk(KERN_INFO"Current Function = %s\n",__func__);
+   printk(KERN_INFO"No. of Scullqsets = %d\n",noqs);
+   temp=(struct scullqset *)kmalloc(sizeof(struct scullqset),GFP_KERNEL);
+   first=temp;
+   printk(KERN_INFO"Address of first scullqset = %p\n",temp);
+   for(i=1;i<noqs;i++)
+   {
+	  temp->next=(struct scullqset *)kmalloc(sizeof(struct scullqset),GFP_KERNEL);//put address into next pointer
+	  printk(KERN_INFO"Address of first scullqset = %p\n",temp->next);
+	  temp=temp->next;//move pointer(temp) to next memory address  
+   }
+   printk(KERN_INFO"Address of first scullqset = %p\n",first);
+   temp->next=NULL;
+   return first;
+}
+void create_qset(struct sculldev *lsculldev,struct scullqset *lscullqset,int noqs)
+{
+   int i;
+
+   printk(KERN_INFO"Inside Function  =  %s\n",__func__);
+   printk(KERN_INFO"No. of Scullqsets in create_qset function= %d\n",noqs);
+   printk(KERN_INFO"address of lscullqset =  %p\n",lscullqset);
+   for(i=0;i<noqs;i++)
+   {
+	  lscullqset->data=(void *)kmalloc((sizeof(void *)* lsculldev->qsetsize),GFP_KERNEL);
+	   
+	  if(!lscullqset->data)
+	  {
+		 printk(KERN_ERR"error in qset_array");
+		 //	  goto out;
+	  }
+	  printk(KERN_INFO"address of data =  %p\n",(void *)lscullqset->data+0);
+	  printk(KERN_INFO"address of data =  %p\n",(void *)lscullqset->data+1);
+	  printk(KERN_INFO"address of data =  %p\n",(void *)lscullqset->data+2);
+	  printk(KERN_INFO"address of data =  %p\n",(void *)lscullqset->data+3);
+	  printk(KERN_INFO"address of data =  %p\n",(void *)lscullqset->data+4);
+	  printk(KERN_INFO"address of data =  %p\n",(void *)lscullqset->data+5);
+	  printk(KERN_INFO"address of data =  %p\n",(void *)lscullqset->data+6);
+	  printk(KERN_INFO"address of data =  %p\n",(void *)lscullqset->data+7);
+	  lscullqset=lscullqset->next;
+   }  
+}
+void create_quantums(struct scullqset *lscullqset,int noq)
+{
+   int lv,no=14;
+   printk(KERN_INFO"function =  %s\n",__func__);
+   for(lv=0;lv<=8;lv++)
+   {
+	  if(no==0)
+		 break;
+	  if(lv==8)
+	  {
+		 lscullqset=lscullqset->next;
+		 lv=0;
+	  }
+	  lscullqset->data[lv]=(void *)kmalloc((8),GFP_KERNEL);
+	  memset(lscullqset->data[lv],'\0',8);
+	  printk(KERN_INFO"address of data[%d] =  %p\n",lv,lscullqset->data[lv]);
+	  no--;
+   }
+}
+ssize_t scull_write(struct file *count,const char __user *buf,size_t size,loff_t *lseek)
+{
+   int flag=0,i,nocr=0,noqs=0,noq=0,noctw=0,nocsw=0;
+   char *buffer1,*data;
+   struct sculldev *lsculldev;
+   struct scullqset *lscullqset;
+   lsculldev=count->private_data;
+   //lsculldev=(struct sculldev *)kmalloc((sizeof(struct sculldev)),GFP_KERNEL);
+   printk(KERN_INFO"address of sculldev11= %p\n",lsculldev);
+   lsculldev->quantum_size=8;
+   lsculldev->qsetsize=8;
+   lsculldev->device_size=0;
+noctw=lsculldev->quantum_size;
+   /*######## buffer to hold Data recieved From Application through Inode ##########*/
+   buffer1=(char*)kmalloc((sizeof(char)*212),GFP_KERNEL); 
+   copy_from_user(buffer1,buf,size);
+   printk(KERN_INFO"buffer data= %s\n",buffer1);
+
+   /*######## Function to calculate REQUIRED NO OF SCULLQSETS according to bytes recieved ###########*/
+   noqs=calculate_scullqsets(lsculldev,size);
+   printk(KERN_INFO"NO of quantum_sets= %d\n",noqs);
+
+   /*######## Function To create scullqsets according to NOQS calculated #################*/
+   lscullqset=lsculldev->scullqset=create_scullqset(noqs);
+
+
+   /*####### Function to create Qsets #############*/ 
+   create_qset(lsculldev,lscullqset,noqs);
+
+   noq=size/lsculldev->quantum_size;
+   if(size%lsculldev->quantum_size)
+	  noq++;
+   printk(KERN_INFO"NO of quantums= %d\n",noq);
+
+   /*####### Function to Create Quantums ###########*/
+   create_quantums(lscullqset,noq);
+   for(i=0;i<=7;i++)
+   {
+   if((flag==1)&&(nocr<8))
+   {
+   copy_from_user((char *)lscullqset->data[i],buf+nocsw,size%noctw);
+   break;
+   }
+flag=1;
+   copy_from_user((char *)lscullqset->data[i],buf+nocsw,8);
+   nocsw=nocsw+noctw;
+   printk(KERN_INFO"no. of characters successfully written %d\n",nocsw);
+   nocr=size-nocsw;
+   printk(KERN_INFO"no. of characters remaining %d\n",nocr);
+	  if(i==7)
+	  {
+	  lscullqset=lscullqset->next;
+	  i=i-8;
+	  }
+   }
+   //}
+ /* lscullqset=lsculldev->scullqset; 
+ strcpy((char*)lscullqset->data[0],"hello");
+   strcpy((char*)lscullqset->data[1],"from");
+   strcpy((char*)lscullqset->data[2],"world");
+   strcpy((char*)lscullqset->data[3],"of");
+   strcpy((char*)lscullqset->data[4],"emblogic");
+   strcpy((char*)lscullqset->data[5],"noida");
+   strcpy((char*)lscullqset->data[6],"india");
+   strcpy((char*)lscullqset->data[7],"world");*/
+lscullqset=lsculldev->scullqset;
+/*data=malloc(sizeof(char)*8);
+memset(data,'\0',8);
+   for(i=0;i<=7;i++)
+   {
+data=(char *)(lscullqset->data[i]);
+
+   printk(KERN_INFO"data in quantum[%d]= %s\n",i,data );
+   }*/
+  for(i=0;i<=7;i++)
+   {
+   printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lscullqset->data[i]));
+   }
+  for(i=0;i<=5;i++)
+   {
+   printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lscullqset->next->data[i]));
+   }
+ /*  for(i=0;i<=7;i++)
+   {
+   printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lscullqset->next->next->next->data[i]));
+   }*/
+   return 0;
+}
+
+@
+
+
+1.28
+log
+@*** empty log message ***
+@
+text
+@d64 1
+a64 1
+   int lv,no=32;
+a116 4
+   printk(KERN_INFO"address of scullqset= %p\n",lscullqset);
+   printk(KERN_INFO"address of scullqset= %p\n",lscullqset->next);
+   printk(KERN_INFO"address of scullqset= %p\n",lscullqset->next->next);
+   printk(KERN_INFO"address of scullqset= %p\n",lscullqset->next->next->next);
+d133 1
+a133 1
+	  i=0;
+d147 1
+a147 1
+data=malloc(sizeof(char)*8);
+d154 1
+a154 1
+   }
+d157 1
+a157 1
+   printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lscullqset->next->data[i]));
+d159 1
+a159 1
+   for(i=0;i<=7;i++)
+d161 1
+a161 1
+   printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lscullqset->next->next->data[i]));
+@
+
+
+1.27
+log
+@*** empty log message ***
+@
+text
+@d31 1
+a32 1
+   printk(KERN_INFO"Address of last scullqset = %p\n",temp);
+d81 1
+a81 1
+ssize_t scull_write(struct file *count,const char __user *buf,size_t size,loff_t *loff)
+d88 1
+a89 1
+   printk(KERN_INFO"IN WRITE f_pos = %d\n",(int)count->f_pos);
+a125 1
+   *loff=*loff+(size%noctw);
+d130 1
+a130 1
+  *loff= nocsw=nocsw+noctw;
+a138 1
+   printk(KERN_INFO"characters written[loff]= %d\n",(int)*loff);
+a139 3
+   printk(KERN_INFO"characters finally written[loff]= %d\n",(int)*loff);
+   count->f_pos=(int)50;
+   printk(KERN_INFO"characters finally written[f_pos]= %d\n",(int)count->f_pos);
+a172 1
+
+@
+
+
+1.26
+log
+@changing print statement of f_pos
+@
+text
+@a87 1
+   //lsculldev=(struct sculldev *)kmalloc((sizeof(struct sculldev)),GFP_KERNEL);
+@
+
+
+1.25
+log
+@CHANGING VALUE OF F_POS MANUALLY.
+@
+text
+@d144 1
+a145 1
+   count->f_pos=(int)50;
+@
+
+
+1.24
+log
+@*** empty log message ***
+@
+text
+@a142 1
+   count->f_pos=(int)50;
+d145 1
+@
+
+
+1.23
+log
+@*** empty log message ***
+@
+text
+@d145 1
+a145 1
+   printk(KERN_INFO"characters finally written[f_pos]= %d\n",count->f_pos);
+@
+
+
+1.22
+log
+@saving value of characters written in loff(local offset)
+copying value of no. of characters finally written into permanent private buffer filep->f_pos.
+@
+text
+@d90 1
+d143 1
+a143 1
+   count->f_pos=*loff;
+d145 1
+a145 1
+   printk(KERN_INFO"characters finally written[f_pos]= %d\n",(int)count->f_pos);
+d179 1
+@
+
+
+1.21
+log
+@*** empty log message ***
+@
+text
+@d81 1
+a81 1
+ssize_t scull_write(struct file *count,const char __user *buf,size_t size,loff_t *lseek)
+d126 1
+d131 1
+a131 1
+   nocsw=nocsw+noctw;
+d140 1
+d142 3
+@
+
+
+1.20
+log
+@memory allocation to lsculldev is not needed.
+@
+text
+@a30 1
+   printk(KERN_INFO"Address of first scullqset = %p\n",first);
+d32 1
+@
+
+
+1.19
+log
+@entering data into quantums successfully.
+@
+text
+@d8 1
+d83 2
+a84 2
+   int i,nocr=0,noqs=0,noq=0,noctw=0,nocsw=0;
+   char *buffer1;
+d88 2
+a89 2
+   printk(KERN_INFO"address of sculldev= %p\n",lsculldev);
+   lsculldev=(struct sculldev*)kmalloc(sizeof(struct sculldev),GFP_KERNEL);
+d106 1
+d121 1
+a121 1
+   /*for(i=0;i<=8;i++)
+d123 1
+a123 5
+	  if(i==8)
+	  {
+	  lscullqset=lscullqset->next;
+	  }
+   if(nocr<8)
+d127 3
+a129 4
+   }*/
+   for(i=0;i<=7;i++)
+   {
+   copy_from_user((char *)lscullqset->data[i],buf+0,8);
+d134 5
+d140 1
+d150 13
+d165 1
+a165 1
+   printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lsculldev->scullqset->data[i]));
+d167 4
+@
+
+
+1.18
+log
+@corrected code for creating scullqset linklist.
+checking conditions in create_qset function prior to memory allocation.
+@
+text
+@d44 1
+d75 1
+d82 1
+a82 1
+   int noqs=0,noq=0;
+d92 1
+a92 1
+
+d119 21
+a139 2
+   lscullqset=lscullqset->next->next->next;
+   strcpy((char*)lscullqset->data[0],"hello");
+d146 5
+a150 9
+   strcpy((char*)lscullqset->data[7],"world");
+   printk(KERN_INFO"data in first quantum= %s\n", (char*)(lscullqset->data[0]));
+   printk(KERN_INFO"data in 2nd quantum= %s\n", (char*)(lscullqset->data[1]));
+   printk(KERN_INFO"data in 3rd quantum= %s\n", (char*)(lscullqset->data[2]));
+   printk(KERN_INFO"data in 4th  quantum= %s\n", (char*)(lscullqset->data[3]));
+   printk(KERN_INFO"data in 5th  quantum= %s\n", (char*)(lscullqset->data[4]));
+   printk(KERN_INFO"data in 6th quantum= %s\n", (char*)(lscullqset->data[5]));
+   printk(KERN_INFO"data in 7th quantum= %s\n", (char*)(lscullqset->data[6]));
+   printk(KERN_INFO"data in 8th quantum= %s\n", (char*)(lscullqset->data[7]));
+@
+
+
+1.17
+log
+@*** empty log message ***
+@
+text
+@d15 1
+a15 1
+struct scullqset * create_scullqset(struct scullqset *lscullqset,int noqs)
+d17 8
+a24 4
+   int i,flag=1;
+   struct scullqset *first;
+   first=NULL;
+   for(i=0;i<noqs;i++)
+d26 3
+a28 5
+	  lscullqset=(struct scullqset *)kmalloc(sizeof(struct scullqset),GFP_KERNEL);
+	  if(flag==1)
+		 first=lscullqset;
+	  flag=0;
+	  lscullqset=lscullqset->next;
+d31 1
+d34 1
+a34 2
+
+void create_qset(struct sculldev *lsculldev,int noqs)
+d37 4
+d43 33
+a75 2
+	  lsculldev->scullqset->data=(void *)kmalloc(sizeof(void *)*lsculldev->qsetsize,GFP_KERNEL);
+	  lsculldev->scullqset=lsculldev->scullqset->next;
+a76 1
+
+a83 1
+   lscullqset=NULL;
+d91 1
+a91 1
+   /*######## buffer to hold Data recieved From Application through Inode @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+d101 1
+a101 1
+   lscullqset=lsculldev->scullqset=create_scullqset(lscullqset,noqs);
+d104 2
+a105 1
+   create_qset(lsculldev,noqs);
+d110 24
+d136 1
+@
+
+
+1.16
+log
+@implemented function for creating qsets.
+calculated number of quantums.
+@
+text
+@d16 15
+a30 15
+  {
+  int i,flag=1;
+  struct scullqset *first;
+  first=NULL;
+  for(i=0;i<noqs;i++)
+  {
+  lscullqset=(struct scullqset *)kmalloc(sizeof(struct scullqset),GFP_KERNEL);
+  if(flag==1)
+  first=lscullqset;
+  flag=0;
+  lscullqset=lscullqset->next;
+  }
+  printk(KERN_INFO"Address of first scullqset = %p\n",first);
+  return first;
+  }
+d32 1
+a32 1
+	void create_qset(struct sculldev *lsculldev,int noqs)
+d34 6
+a39 6
+int i;
+for(i=0;i<noqs;i++)
+{
+lsculldev->scullqset->data=(void *)kmalloc(sizeof(void *)*lsculldev->qsetsize,GFP_KERNEL);
+lsculldev->scullqset=lsculldev->scullqset->next;
+}
+d69 4
+a72 4
+	create_qset(lsculldev,noqs);
+	noq=size/lsculldev->quantum_size;
+	if(size%lsculldev->quantum_size)
+	   noq++;
+@
+
+
+1.15
+log
+@*** empty log message ***
+@
+text
+@d2 2
+a3 2
+
+int calculate_qsets(struct sculldev *lsculldev,int size)
+a5 1
+   ///lsculldev=(struct sculldev *)kmalloc(sizeof(struct sculldev),GFP_KERNEL);
+d13 3
+a15 2
+//scullqsets are made according to data bytes written to device buffer
+struct scullqset * create_qset(struct scullqset *lscullqset,int noqs)
+d31 11
+d44 1
+a44 1
+   int noqs=0;
+d55 2
+d60 3
+a62 1
+   noqs=calculate_qsets(lsculldev,size);
+d64 10
+a73 1
+   lscullqset=lsculldev->scullqset=create_qset(lscullqset,noqs);
+@
+
+
+1.14
+log
+@implemented function create scullqset according to number of qsets required.
+@
+text
+@a46 2
+   printk(KERN_INFO"quantum_size=%d\n",lsculldev->quantum_size);
+   printk(KERN_INFO"qset_size=%d\n",lsculldev->qsetsize);
+@
+
+
+1.13
+log
+@*** empty log message ***
+@
+text
+@d15 1
+a15 1
+/*struct scullqset * create_qset(struct scullqset *lscullqset,int noqs)
+d28 1
+d30 1
+a30 1
+  }*/
+d37 1
+a49 4
+   //  noqs=size/(lsculldev->quantum_size * lsculldev->qsetsize);
+   // if(size%(lsculldev->quantum_size * lsculldev->qsetsize));
+   // noqs++;
+   //   lscullqset=lsculldev->scullqset=create_qset(lscullqset,noqs);
+d51 1
+@
+
+
+1.12
+log
+@function called to calculate required number of qsets according to buffer size.
+@
+text
+@d3 11
+a13 11
+   int calculate_qsets(struct sculldev *lsculldev,int size)
+	 {
+	 int noqs=0;
+	 ///lsculldev=(struct sculldev *)kmalloc(sizeof(struct sculldev),GFP_KERNEL);
+	 printk(KERN_INFO"quantum_size=%d",lsculldev->quantum_size);
+	 printk(KERN_INFO"qset_size=%d",lsculldev->qsetsize);
+	 noqs=size/(lsculldev->quantum_size*lsculldev->qsetsize);
+	 if(size%(lsculldev->quantum_size*lsculldev->qsetsize))
+	 noqs++;
+	 return noqs;
+	 }
+d48 1
+a48 1
+ //  noqs=size/(lsculldev->quantum_size * lsculldev->qsetsize);
+d50 1
+a50 1
+    // noqs++;
+a52 1
+   printk(KERN_INFO"buffer data= %s\n",buffer1);
+@
+
+
+1.11
+log
+@corrected buffer size to 212 as it causes kernel crash.
+@
+text
+@d3 1
+a3 1
+/*   int calculate_qsets(struct sculldev *lsculldev,int size1)
+d6 1
+a6 1
+	 lsculldev=(struct sculldev *)kmalloc(sizeof(struct sculldev),GFP_KERNEL);
+d9 2
+a10 2
+	 noqs=size1/(lsculldev->quantum_size*lsculldev->qsetsize);
+	 if(size1%(lsculldev->quantum_size*lsculldev->qsetsize));
+d13 1
+a13 1
+	 }*/
+d47 2
+a48 1
+   noqs=size/(lsculldev->quantum_size * lsculldev->qsetsize);
+d50 1
+a50 1
+   //  noqs++;
+@
+
+
+1.10
+log
+@corrected logical errors.
+created local sculldev and data is assigned inside structure.
+@
+text
+@d42 1
+a42 1
+   buffer1=(char*)kmalloc((sizeof(char)*40),GFP_KERNEL); 
+@
+
+
+1.9
+log
+@created functions to create qsets and calculate required qsets.
+@
+text
+@d2 12
+a13 8
+   int calculate_qsets(struct sculldev *lsculldev)
+{
+   noqs=size/(lsculldev->quantum_size*lsculldev->qsetsize);
+   if(size%(lsculldev->quantum_size*lsculldev->qsetsize));
+   {
+	  noqs++;
+   }
+}
+d15 15
+a29 14
+struct scullqset * create_qset(struct scullqset *lscullqset,int noqs)
+{
+   int i,flag=1;
+   struct scullqset *first;
+   for(i=0;i<noqs;i++)
+   {
+	  lscullqset=(struct  scullqset *)kmalloc(sizeof struct scullqset);
+	  if(flag==1)
+		 first=lscullqset;
+	  flag=0;
+	  lscullqset=lscullqset->next;
+   }
+return first;
+}
+d32 1
+a32 2
+   size_t size;
+   int noqs;
+a34 1
+   lsculldev=(struct sculldev *)malloc(sizeof(struct sculldev ));
+d36 17
+a52 4
+   lscullqset=NULL;
+   noqs=calculate_qsets(lsculldev);
+   lscullqset=lsculldev->scullqset=create_qset(lscullqset,noqs);
+   printk(KERN_INFO"NO of quantum_sets= %d",noqs);
+@
+
+
+1.8
+log
+@print the quantum value.
+changed qset[0].
+removed memory allocation for qset as it is pointer.
+there is no need of typecasting as data is pointer to integer pointer.
+@
+text
+@d2 1
+a2 3
+//#include"file_operations.h"
+//int main()
+ssize_t scull_write(struct file *count,const char __user *buf,size_t buffer,loff_t *lseek)
+d4 34
+a37 19
+int a,b=0,quantum=5;
+//void *qset[b];
+char *buffer1;
+int *qset[8];
+struct sculldev *lsculldev;
+buffer1=malloc(sizeof(char *)*50);
+memset(buffer1,'\0',50);
+copy_from_user(buffer1,buf,buffer);
+printk(KERN_INFO"buffer = %s\n",buffer1);
+lsculldev=(struct sculldev *)malloc(sizeof(struct sculldev ));
+lsculldev->qsetsize=8;
+//b=lsculldev->qsetsize;
+lsculldev->scullqset=(struct scullqset *)malloc(sizeof(struct scullqset));
+//for(a=0;a<lsculldev->qsetsize;a++)
+qset[0]=&quantum;
+printk(KERN_INFO"value of quantum= %d",*(qset[0]));
+lsculldev->scullqset->data=&qset[0];
+printk(KERN_INFO"data in quantum = %d\n",**(lsculldev->scullqset->data));
+return 0;
+@
+
+
+1.7
+log
+@allocated memory to lsculldev,scullqset,added quantums and writing into data
+@
+text
+@d7 1
+a7 1
+void *qset[b];
+d9 1
+d17 1
+a17 1
+b=lsculldev->qsetsize;
+d19 1
+a19 2
+for(a=0;a<lsculldev->qsetsize;a++)
+qset[a]=(void *)malloc(sizeof(void *));
+d21 3
+a23 1
+lsculldev->scullqset->data=qset[0];
+@
+
+
+1.6
+log
+@*** empty log message ***
+@
+text
+@d6 2
+d10 1
+a10 1
+buffer1=malloc(sizeof(char)*50);
+d14 8
+a21 5
+//void *qset[qsetsize];
+//lsculldev=(struct sculldev *)malloc(sizeof(struct sculldev ));
+//lsculldev->scullqset=(struct scullqset *)malloc(sizeof(struct scullqset));
+//qset=(void *)malloc(sizeof(void *)*qsetsize);
+//lsculldev->scullqset->qset=(int *)&quantum;
+@
+
+
+1.5
+log
+@removed printk statement as %d is format specifier for integer but data type of buffer is ssize_t.
+@
+text
+@d3 1
+d7 1
+d12 5
+@
+
+
+1.4
+log
+@corrected %s to %d in printk for buffer because ssize_t is type of integer.
+@
+text
+@a9 1
+printk(KERN_INFO"write bytes %d\n",buffer);
+@
+
+
+1.3
+log
+@included print statement which prints count of bytes written into node.
+@
+text
+@d10 1
+a10 1
+printk(KERN_INFO"write bytes %s\n",buffer);
+@
+
+
+1.2
+log
+@no change.
+@
+text
+@d10 1
+a10 1
+printk(KERN_INFO"write bytes %s\n",buf);
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 1
+d5 5
+@

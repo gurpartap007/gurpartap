@@ -1,0 +1,90 @@
+head	1.3;
+access;
+symbols;
+locks
+	root:1.3; strict;
+comment	@ * @;
+
+
+1.3
+date	2014.06.29.09.18.01;	author root;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2014.05.18.22.47.28;	author root;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2014.05.12.11.00.13;	author root;	state Exp;
+branches;
+next	;
+
+
+desc
+@started the device driver with single device.
+ 17 implemented initialization and registration of device driver.
+ 18 allocated major no and minor no. to the device.
+ 19 added the device to the kernel.
+@
+
+
+1.3
+log
+@modified fops declaration
+@
+text
+@#include"header.h"
+#include"declarations.h"
+#include"file_operations.h"//IF NOT INCLUDED THEN YOUR FUNCTIONS DESCRIBED IN FILE OPERATIONS ARE NOT CALLED BY KERNEL
+ dev_t dev;
+int ret,major_no,minor_no,nod=1;
+struct sculldev *sculldev;
+#define CHAR_DRIVER "gurpartap";
+static int  __init initial(void)
+{
+   printk(KERN_INFO"Loading Initial Function\n");
+   alloc_chrdev_region(&dev,0,nod,"char_driver");
+   sculldev=(struct sculldev *)kmalloc (sizeof(struct sculldev),GFP_KERNEL);
+ memset(sculldev,'\0',sizeof(struct sculldev));
+major_no=MAJOR(dev);
+   minor_no=MINOR(dev);
+   printk(KERN_INFO"Major No=  %d\n",major_no);
+   printk(KERN_INFO"Minor No= %d\n",minor_no);
+   sculldev->c_dev.ops=&fops;
+   cdev_init(&sculldev->c_dev,&fops);
+   sculldev->c_dev.owner= THIS_MODULE;
+   ret=cdev_add(&sculldev->c_dev,dev,nod);
+   return 0;
+}
+module_init(initial);
+@
+
+
+1.2
+log
+@included memset function to clear memory.
+included header for file_operations.h to properly connect the file operations defined by the user.
+@
+text
+@a5 1
+struct file_operations fops;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d3 1
+d12 1
+d14 2
+a15 2
+   alloc_chrdev_region(&dev,0,nod,"char_driver");
+   major_no=MAJOR(dev);
+d19 1
+a20 1
+   sculldev->c_dev.ops=&fops;
+@

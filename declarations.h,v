@@ -1,0 +1,51 @@
+head	1.2;
+access;
+symbols;
+locks
+	root:1.2; strict;
+comment	@ * @;
+
+
+1.2
+date	2014.05.18.22.50.06;	author root;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2014.05.12.10.56.12;	author root;	state Exp;
+branches;
+next	;
+
+
+desc
+@gave prototype for structure sculldev.
+gave extern variables.
+@
+
+
+1.2
+log
+@removed declaration of struct sculldev 
+remove header files included.
+@
+text
+@extern dev_t dev;
+extern struct file_operations fops;
+extern struct sculldev *sculldev;
+
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a3 6
+struct sculldev
+{
+   struct cdev c_dev;
+};
+
+// struct sculldev *sculldev1;
+@
