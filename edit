@@ -5,6 +5,7 @@ co -l declarations.h
 co -l header.h
 co -l scull_open.c 
 co -l scull_read.c 
+co -l scull_lseek.c 
 co -l scull_write.c
 co -l scull_release.c
 co -l file_operations.h

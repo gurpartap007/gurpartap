@@ -1,10 +1,15 @@
-head	1.10;
+head	1.11;
 access;
 symbols;
 locks
-	root:1.10; strict;
+	root:1.11; strict;
 comment	@ * @;
 
+
+1.11
+date	2014.07.05.12.58.37;	author root;	state Exp;
+branches;
+next	1.10;
 
 1.10
 date	2014.06.30.17.51.39;	author root;	state Exp;
@@ -62,9 +67,9 @@ desc
 @
 
 
-1.10
+1.11
 log
-@entered declaration for scull_read function.
+@entered declaration of lseek function.
 @
 text
 @#include<linux/init.h>
@@ -99,7 +104,18 @@ int scull_open(struct inode *,struct file *);
 ssize_t scull_write(struct file *,const char __user *,size_t,loff_t *);
 ssize_t scull_read(struct file *, char __user *,size_t,loff_t *);
 int scull_release(struct inode *,struct file *);
+loff_t scull_lseek(struct file *, loff_t, int);
 
+@
+
+
+1.10
+log
+@entered declaration for scull_read function.
+@
+text
+@d33 1
+a33 1
 
 @
 
