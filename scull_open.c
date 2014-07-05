@@ -2,16 +2,27 @@
 #include"declarations.h"
 int scull_trim(struct sculldev * lsculldev)
 {
-   int i;
+   int loop_count=0,i,noq,data_size,quantum_size;
    struct scullqset *lscullqset,*prev;
    prev=NULL;
+   data_size=lsculldev->data_size;
+   printk(KERN_INFO"data size in trim function= %d\n",data_size);
+   quantum_size=lsculldev->quantum_size;
+   printk(KERN_INFO"quantum size in trim function= %d\n",quantum_size);
+	noq=data_size/quantum_size;
+	if((data_size%quantum_size)!=0)
+	   noq++;
+   printk(KERN_INFO"noq value in trim function= %d\n",noq);
+	loop_count=noq%quantum_size;
+	loop_count--;
+   printk(KERN_INFO"loop_count in trim function= %d\n",loop_count);
    lscullqset=lsculldev->scullqset;
    while(lscullqset->next!=NULL)
    {
 	  prev=lscullqset;
 	  lscullqset=lscullqset->next;
 	  printk(KERN_INFO"freed memory %p\n",lscullqset);
-	  for(i=0;i<=5;i++)
+	  for(i=0;i<=loop_count;i++)
 	  {
 		 kfree(lscullqset->data[i]);
 		 printk(KERN_INFO"freed memory data[%i]%p\n",i,lscullqset->data[i]);
@@ -23,7 +34,7 @@ int scull_trim(struct sculldev * lsculldev)
 	  prev->next=NULL;
 	  lscullqset=lsculldev->scullqset;
 	  printk(KERN_INFO"freed memory %p\n",lscullqset);
-   }////////
+   }
    for(i=0;i<8;i++)
    {
 	  kfree(prev->data[i]);

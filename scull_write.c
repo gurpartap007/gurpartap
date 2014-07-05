@@ -61,11 +61,11 @@ void create_qset(struct sculldev *lsculldev,struct scullqset *lscullqset,int noq
 }
 void create_quantums(struct scullqset *lscullqset,int noq)
 {
-   int lv,no=14;
+   int lv;
    printk(KERN_INFO"function =  %s\n",__func__);
    for(lv=0;lv<=8;lv++)
    {
-	  if(no==0)
+	  if(noq==0)
 		 break;
 	  if(lv==8)
 	  {
@@ -75,7 +75,7 @@ void create_quantums(struct scullqset *lscullqset,int noq)
 	  lscullqset->data[lv]=(void *)kmalloc((8),GFP_KERNEL);
 	  memset(lscullqset->data[lv],'\0',8);
 	  printk(KERN_INFO"address of data[%d] =  %p\n",lv,lscullqset->data[lv]);
-	  no--;
+	  noq--;
    }
 }
 ssize_t scull_write(struct file *count,const char __user *buf,size_t size,loff_t *lseek)
@@ -135,38 +135,22 @@ flag=1;
 	  i=i-8;
 	  }
    }
-   //}
- /* lscullqset=lsculldev->scullqset; 
- strcpy((char*)lscullqset->data[0],"hello");
-   strcpy((char*)lscullqset->data[1],"from");
-   strcpy((char*)lscullqset->data[2],"world");
-   strcpy((char*)lscullqset->data[3],"of");
-   strcpy((char*)lscullqset->data[4],"emblogic");
-   strcpy((char*)lscullqset->data[5],"noida");
-   strcpy((char*)lscullqset->data[6],"india");
-   strcpy((char*)lscullqset->data[7],"world");*/
 lscullqset=lsculldev->scullqset;
-   printk(KERN_INFO"Value of bytes written %d\n",lsculldev->data_size);
-/*data=malloc(sizeof(char)*8);
-memset(data,'\0',8);
-   for(i=0;i<=7;i++)
+ printk(KERN_INFO"Value of bytes written %d\n",lsculldev->data_size);
+ while(1)
+ {
+  for(i=0;i<lsculldev->qsetsize;i++)
    {
-data=(char *)(lscullqset->data[i]);
-
-   printk(KERN_INFO"data in quantum[%d]= %s\n",i,data );
-   }*/
-  for(i=0;i<=7;i++)
-   {
+	  if(noq==0)
+		 break;
    printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lscullqset->data[i]));
+   noq--;
+   printk(KERN_INFO"NOQ value in loop= %d\n",noq);
    }
-  for(i=0;i<=5;i++)
-   {
-   printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lscullqset->next->data[i]));
-   }
- /*  for(i=0;i<=7;i++)
-   {
-   printk(KERN_INFO"data in quantum[%d]= %s\n",i, (char*)(lscullqset->next->next->next->data[i]));
-   }*/
+ if(noq==0)
+	break;
+  lscullqset=lscullqset->next;
+ } 
    return 0;
 }
 
