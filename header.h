@@ -9,6 +9,7 @@
 #include<linux/cdev.h>
 #include<linux/slab.h>
 #include<linux/string.h>
+#include<linux/proc_fs.h>
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Module for Character Driver");
 MODULE_AUTHOR("GURPARTAP_SINGH");

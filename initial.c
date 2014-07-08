@@ -4,7 +4,19 @@
  dev_t dev;
 int ret,major_no,minor_no,nod=1;
 struct sculldev *sculldev;
-#define CHAR_DRIVER "gurpartap";
+struct proc_dir_entry *child; //*parent;
+char *hello="hello! I am in proc function";
+int read_proc(char *page, char **start, off_t off,int count, int *eof, void *data)
+{
+int ret1 ;
+printk(KERN_INFO"Begin :%s\n",__func__);
+page=strcpy(page,hello);
+ret1=strlen(page);
+count=ret1;
+return count;
+}
+
+#define CHAR_DRIVER "ch_driver";
 static int  __init initial(void)
 {
    printk(KERN_INFO"Loading Initial Function\n");
@@ -17,6 +29,8 @@ major_no=MAJOR(dev);
    printk(KERN_INFO"Minor No= %d\n",minor_no);
    sculldev->c_dev.ops=&fops;
    cdev_init(&sculldev->c_dev,&fops);
+   //parent=proc_mkdir("ch_driver",NULL);
+   child=create_proc_read_entry("gurpartap",S_IRUSR,NULL,read_proc,NULL);
    sculldev->c_dev.owner= THIS_MODULE;
    ret=cdev_add(&sculldev->c_dev,dev,nod);
    return 0;
