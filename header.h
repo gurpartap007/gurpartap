@@ -9,6 +9,7 @@
 #include<linux/cdev.h>
 #include<linux/slab.h>
 #include<linux/string.h>
+#include<linux/semaphore.h>
 #include<linux/proc_fs.h>
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Module for Character Driver");
@@ -17,15 +18,15 @@ struct sculldev
 {
 struct cdev c_dev;
 struct scullqset *scullqset;
-int quantum_size;
-int qsetsize;
-int device_size;
-int data_size;
+unsigned int quantum_size;
+unsigned int qsetsize;
+unsigned int device_size;
+unsigned int data_size;
 };
 struct scullqset
 {
 struct scullqset *next;
-int **data;
+unsigned int **data;
 };
 int scull_open(struct inode *,struct file *);
 ssize_t scull_write(struct file *,const char __user *,size_t,loff_t *);

@@ -80,8 +80,7 @@ void create_quantums(struct scullqset *lscullqset,int noq)
 }
 ssize_t scull_write(struct file *count,const char __user *buf,size_t size,loff_t *lseek)
 {
-   int flag=0,i,nocr=0,noqs=0,noq=0,noctw=0,nocsw=0;
-   char *buffer1;
+   unsigned int flag=0,i,nocr=0,noqs=0,noq=0,noctw=0,nocsw=0;
    struct sculldev *lsculldev;
    struct scullqset *lscullqset;
    lsculldev=count->private_data;
@@ -92,12 +91,9 @@ ssize_t scull_write(struct file *count,const char __user *buf,size_t size,loff_t
    lsculldev->device_size=0;
 noctw=lsculldev->quantum_size;
    printk(KERN_INFO"Value of F_POS %d\n",(int)count->f_pos);
-   printk(KERN_INFO"Value of bytes written %d\n",lsculldev->data_size);
+   printk(KERN_INFO"Value of bytes written %d\n",(int)size);
    /*######## buffer to hold Data recieved From Application through Inode ##########*/
-   buffer1=(char*)kmalloc((sizeof(char)*212),GFP_KERNEL); 
-   copy_from_user(buffer1,buf,size);
-   printk(KERN_INFO"buffer data= %s\n",buffer1);
-
+ //  down(&lsculldev->sem);
    /*######## Function to calculate REQUIRED NO OF SCULLQSETS according to bytes recieved ###########*/
    noqs=calculate_scullqsets(lsculldev,size);
    printk(KERN_INFO"NO of quantum_sets= %d\n",noqs);
@@ -121,6 +117,11 @@ noctw=lsculldev->quantum_size;
    if((flag==1)&&(nocr<8))
    {
    copy_from_user((char *)lscullqset->data[i],buf+nocsw,size%noctw);
+	  printk(KERN_INFO"break from loop1\n");
+	  nocsw=nocsw+(size%noctw);
+   printk(KERN_INFO"no. of characters successfully written %d\n",nocsw);
+		 nocr=size-nocsw;
+   printk(KERN_INFO"no. of characters remaining %d\n",nocr);
    break;
    }
 flag=1;
@@ -128,6 +129,11 @@ flag=1;
    nocsw=nocsw+noctw;
    printk(KERN_INFO"no. of characters successfully written %d\n",nocsw);
    nocr=size-nocsw;
+   if(nocr==0)
+   {
+	  printk(KERN_INFO"break from loop2\n");
+	  break;
+   }
    lsculldev->data_size=nocsw;
    printk(KERN_INFO"no. of characters remaining %d\n",nocr);
 	  if(i==7)
@@ -137,10 +143,9 @@ flag=1;
 	  }
    }
 lscullqset=lsculldev->scullqset;
- printk(KERN_INFO"Value of bytes written %d\n",lsculldev->data_size);
  while(1)
  {
-  for(i=0;i<lsculldev->qsetsize;i++)
+  for(i=0;i<8;i++)
    {
 	  if(noq==0)
 		 break;
@@ -151,7 +156,8 @@ lscullqset=lsculldev->scullqset;
  if(noq==0)
 	break;
   lscullqset=lscullqset->next;
- } 
+ }
+//up(&lsculldev->sem) ;*/
    return 0;
 }
 
