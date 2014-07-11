@@ -11,6 +11,7 @@
 #include<linux/string.h>
 #include<linux/semaphore.h>
 #include<linux/proc_fs.h>
+#include<linux/jiffies.h>
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Module for Character Driver");
 MODULE_AUTHOR("GURPARTAP_SINGH");
@@ -22,6 +23,7 @@ unsigned int quantum_size;
 unsigned int qsetsize;
 unsigned int device_size;
 unsigned int data_size;
+struct semaphore sem;
 };
 struct scullqset
 {

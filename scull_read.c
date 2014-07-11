@@ -1,4 +1,5 @@
 #include"header.h"
+ struct timespec value;
 ssize_t scull_read(struct file *filep,char __user *buffer1,size_t count,loff_t *lseek)
 {
 	struct sculldev *lsculldev;
@@ -42,6 +43,8 @@ ssize_t scull_read(struct file *filep,char __user *buffer1,size_t count,loff_t *
 		else
 		   break;
 	}
+	b=jiffies;
+	c=time_before(a,b);
 
 	return 0;
 }
