@@ -15,6 +15,7 @@
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Module for Character Driver");
 MODULE_AUTHOR("GURPARTAP_SINGH");
+extern unsigned long t,b,c;
 struct sculldev
 {
 struct cdev c_dev;

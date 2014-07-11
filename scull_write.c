@@ -1,4 +1,5 @@
 #include"header.h"
+#include"declarations.h"
 /*######## Function to calculate no. of Scullqsets #################*/
 int calculate_scullqsets(struct sculldev *lsculldev,int size)
 {
@@ -78,12 +79,11 @@ void create_quantums(struct scullqset *lscullqset,int noq)
 	  noq--;
    }
 }
+   unsigned long t;
 ssize_t scull_write(struct file *count,const char __user *buf,size_t size,loff_t *lseek)
 {
    unsigned int flag=0,i,nocr=0,noqs=0,noq=0,noctw=0,nocsw=0;
-   unsigned long a,b,d;
-   struct timespec value;
-   struct sculldev *lsculldev;
+    struct sculldev *lsculldev;
    struct scullqset *lscullqset;
      //value=(struct time_spec * )kmalloc((sizeof(struct time_spec)),GFP_KERNEL);
    value.tv_sec=0;
@@ -100,7 +100,7 @@ noctw=lsculldev->quantum_size;
    /*######## buffer to hold Data recieved From Application through Inode ##########*/
    down(&lsculldev->sem);
    /*######## Function to calculate REQUIRED NO OF SCULLQSETS according to bytes recieved ###########*/
-   a=jiffies;
+t=jiffies;
    noqs=calculate_scullqsets(lsculldev,size);
    printk(KERN_INFO"NO of quantum_sets= %d\n",noqs);
 

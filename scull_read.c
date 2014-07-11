@@ -1,5 +1,6 @@
 #include"header.h"
  struct timespec value;
+   unsigned long b,c;
 ssize_t scull_read(struct file *filep,char __user *buffer1,size_t count,loff_t *lseek)
 {
 	struct sculldev *lsculldev;
@@ -44,7 +45,11 @@ ssize_t scull_read(struct file *filep,char __user *buffer1,size_t count,loff_t *
 		   break;
 	}
 	b=jiffies;
-	c=time_before(a,b);
+	c=time_before(t,b);
+	jiffies_to_timespec(c,&value);
+			printk(KERN_INFO"time in jiffies = %ld\n",c);
+			printk(KERN_INFO"time in seconds = %ld\n",value.tv_sec);
+			printk(KERN_INFO"time in nano-seconds = %ld\n",value.tv_nsec);
 
 	return 0;
 }

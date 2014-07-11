@@ -2,13 +2,12 @@
 #include"declarations.h"
 #include"file_operations.h"//IF NOT INCLUDED THEN YOUR FUNCTIONS DESCRIBED IN FILE OPERATIONS ARE NOT CALLED BY KERNEL
 dev_t dev;
-struct timespec value;
 int ret,major_no,minor_no,nod=1;
 struct sculldev *sculldev;
 struct proc_dir_entry *child; //*parent;
 int read_proc(char *page, char **start, off_t off,int count, int *eof, void *data)
 {
-   count=sprintf(page,"qsetz_size = %d\n""device_size = %d\n""time difference in jiffies = %ld",sculldev->qsetsize,sculldev->device_size,value.tv_nsec) ;
+   count=sprintf(page,"qsetz_size = %d\n""device_size = %d\n""time difference in jiffies(nano-seconds)= %ld\n""time differencein jiffies(seconds)= %ld\n",sculldev->qsetsize,sculldev->device_size,value.tv_sec,value.tv_nsec) ;
    printk(KERN_INFO"page-------%s\n",page);
    return count;
 }
