@@ -26,7 +26,8 @@ static int  __init initial(void)
    sculldev->c_dev.ops=&fops;
    cdev_init(&sculldev->c_dev,&fops);
    //  parent=proc_mkdir("ch_driver",NULL);
-   sema_init(&sculldev->sem,1);
+   //sema_init(&sculldev->sem,1);
+   init_completion(&sculldev->sem);
    child=create_proc_read_entry("gurpartap",S_IRUSR,NULL,read_proc,NULL);
    sculldev->c_dev.owner= THIS_MODULE;
    ret=cdev_add(&sculldev->c_dev,dev,nod);

@@ -98,7 +98,6 @@ noctw=lsculldev->quantum_size;
    printk(KERN_INFO"Value of F_POS %d\n",(int)count->f_pos);
    printk(KERN_INFO"Value of bytes written %d\n",(int)size);
    /*######## buffer to hold Data recieved From Application through Inode ##########*/
-   down(&lsculldev->sem);
    /*######## Function to calculate REQUIRED NO OF SCULLQSETS according to bytes recieved ###########*/
 t=jiffies;
    noqs=calculate_scullqsets(lsculldev,size);
@@ -163,7 +162,8 @@ lscullqset=lsculldev->scullqset;
 	break;
   lscullqset=lscullqset->next;
  }
-up(&lsculldev->sem) ;
+
+ complete(&lsculldev->sem);
   return 0;
 }
 

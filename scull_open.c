@@ -68,7 +68,10 @@ int scull_trim(struct sculldev * lsculldev)
 	  }
 	  }
 	  if((filep->f_flags & O_ACCMODE) == O_RDONLY)
+	  {
 		 printk(KERN_INFO"OPEN WITH READ ONLY\n");
+	
+	  }
 	  if((filep->f_flags & O_ACCMODE) == O_RDWR)
 		 printk(KERN_INFO"OPEN WITH READ/WRITE ONLY\n");
 	  return 0;

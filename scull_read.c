@@ -7,6 +7,7 @@ ssize_t scull_read(struct file *filep,char __user *buffer1,size_t count,loff_t *
 	struct scullqset *lscullqset;
 	int flag=0,i,nocsw=0,nocr=0,total_size=0,quantum_size,noctr=0;
 	lsculldev=filep->private_data;
+			wait_for_completion(&lsculldev->sem);
 	total_size=nocr=lsculldev->data_size;
 	lscullqset=lsculldev->scullqset;
 	quantum_size=lsculldev->quantum_size;
@@ -47,10 +48,10 @@ ssize_t scull_read(struct file *filep,char __user *buffer1,size_t count,loff_t *
 	b=jiffies;
 	c=time_before(t,b);
 	jiffies_to_timespec(c,&value);
+
 			printk(KERN_INFO"time in jiffies = %ld\n",c);
 			printk(KERN_INFO"time in seconds = %ld\n",value.tv_sec);
 			printk(KERN_INFO"time in nano-seconds = %ld\n",value.tv_nsec);
-
 	return 0;
 }
 
