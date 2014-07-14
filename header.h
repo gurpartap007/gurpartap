@@ -13,9 +13,12 @@
 #include<linux/proc_fs.h>
 #include<linux/completion.h>
 #include<linux/jiffies.h>
+#include</usr/src/kernels/linux-2.6.38.8/arch/x86/include/asm/msr.h>
+
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Module for Character Driver");
 MODULE_AUTHOR("GURPARTAP_SINGH");
+extern unsigned long start;
 extern unsigned long t,b,c;
 struct sculldev
 {
